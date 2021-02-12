@@ -3,8 +3,8 @@
  */
 package kynake.discord.bot;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
+// import java.nio.file.Files;
+// import java.nio.file.Path;
 
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -16,13 +16,19 @@ public class TestBot {
     public static JDA jda;
 
     public String getGreeting() {
-        return "Hello World!2";
+        return "Hello World!";
+    }
+
+    public String getVersion() {
+        return System.getProperty("java.version");
     }
 
     public static void main(String[] args) throws IOException, LoginException {
-        System.out.println(new TestBot().getGreeting());
+        TestBot inst = new TestBot();
+        System.out.println(inst.getGreeting());
+        System.out.println("Java version: " + inst.getVersion());
 
-        String token = Files.readString(Path.of("token.txt"));
+        String token = "secret";
 
         GatewayIntent gw = GatewayIntent.GUILD_MESSAGES;
 
