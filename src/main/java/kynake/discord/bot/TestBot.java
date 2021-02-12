@@ -3,12 +3,29 @@
  */
 package kynake.discord.bot;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import net.dv8tion.jda.api.*;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+
 public class TestBot {
+    public static JDA jda;
+
     public String getGreeting() {
-        return "Hello World!";
+        return "Hello World!2";
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, LoginException {
         System.out.println(new TestBot().getGreeting());
+
+        String token = Files.readString(Path.of("token.txt"));
+
+        GatewayIntent gw = GatewayIntent.GUILD_MESSAGES;
+
+        jda = JDABuilder.create(token, gw).build();
     }
 }
