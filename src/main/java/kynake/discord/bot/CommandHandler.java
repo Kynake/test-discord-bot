@@ -43,13 +43,17 @@ public class CommandHandler extends ListenerAdapter {
   }
 
   public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-    String[] args = event.getMessage().getContentDisplay().split("\\s+");
+    String message = event.getMessage().getContentDisplay();
 
-    if(args.length > 0 && args[0].startsWith(prefix)) {
-      Command command = commands.get(args[0].substring(prefix.length()).toLowerCase());
-      if(command != null) {
-        command.execute(event, Arrays.copyOfRange(args, 1, args.length));
-      }
+    // Only parse messages that start with the prefix
+    if(message.length() == 0 || !message.startsWith(prefix)) {
+      return;
+    }
+
+    String[] args = message.split("\\s+");
+    Command command = commands.get(args[0].substring(prefix.length()).toLowerCase());
+    if(command != null) {
+      command.execute(event, Arrays.copyOfRange(args, 1, args.length));
     }
   }
 }
