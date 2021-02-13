@@ -1,12 +1,17 @@
 package kynake.discord.bot.commands;
 
+// JDA
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
+// Java
 import java.util.Arrays;
-
 
 public class Shutdown implements Command {
   private String commandString = "shutdown";
+
+  public String getCommandString() {
+    return commandString;
+  }
 
   public String register() {
     System.out.println("Shutdown registered");
@@ -20,9 +25,5 @@ public class Shutdown implements Command {
     event.getJDA().shutdownNow();
     System.exit(0);
     return true;
-  }
-
-  public String getCommandString() {
-    return commandString;
   }
 }

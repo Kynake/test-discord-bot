@@ -1,10 +1,13 @@
 package kynake.discord.bot.handlers;
 
+// Internal
 import kynake.discord.bot.commands.*;
 
+// JDA
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
+// Java
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.Arrays;
