@@ -1,8 +1,11 @@
 package kynake.discord.bot.commands;
 
+// Internal
+import kynake.discord.bot.audio.AudioTester;
+import kynake.discord.bot.audio.AudioRecorder;
+
 // JDA
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import kynake.discord.bot.audio.AudioRecorder;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
 
@@ -31,7 +34,7 @@ public class JoinVoice implements Command {
     // If Author is in a voice channel in the Guild, join it
 
     AudioManager audioManager = event.getGuild().getAudioManager();
-    AudioRecorder recorder = new AudioRecorder();
+    AudioTester recorder = new AudioTester(event.getAuthor());
 
     audioManager.setReceivingHandler(recorder);
     audioManager.setSendingHandler(recorder); // Test audio with echo
