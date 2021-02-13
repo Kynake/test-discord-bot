@@ -27,7 +27,7 @@ public class JoinVoice implements Command {
     // Get the voice channel the Author of the message is at
     VoiceChannel authorVoiceChannel = event.getMember().getVoiceState().getChannel();
     if(authorVoiceChannel == null) {
-      System.out.println("Author is not is a voice channel");
+      System.out.println("Author is not in a voice channel");
       return false;
     }
 
