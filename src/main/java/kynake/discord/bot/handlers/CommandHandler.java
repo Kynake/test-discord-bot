@@ -24,6 +24,7 @@ public class CommandHandler extends ListenerAdapter {
     // Register Commands
     createCommand(Info.class);
     createCommand(Shutdown.class);
+    createCommand(JoinVoice.class);
 
     System.out.println("Created Commands: " + commands.keySet().stream().map(command -> prefix + command).collect(Collectors.joining(", ")));
   }
