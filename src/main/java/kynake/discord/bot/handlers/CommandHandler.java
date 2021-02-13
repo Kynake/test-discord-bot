@@ -1,4 +1,4 @@
-package kynake.discord.bot;
+package kynake.discord.bot.handlers;
 
 import kynake.discord.bot.commands.*;
 

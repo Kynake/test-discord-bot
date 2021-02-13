@@ -11,6 +11,8 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import javax.security.auth.login.LoginException;
 
+import kynake.discord.bot.handlers.CommandHandler;
+
 import java.io.IOException;
 
 public class TestBot {
