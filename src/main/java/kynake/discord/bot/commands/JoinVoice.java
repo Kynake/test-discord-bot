@@ -34,10 +34,10 @@ public class JoinVoice implements Command {
     // If Author is in a voice channel in the Guild, join it
 
     AudioManager audioManager = event.getGuild().getAudioManager();
-    AudioTester recorder = new AudioTester(event.getAuthor());
+    AudioRecorder recorder = new AudioRecorder(event.getAuthor(), "out.wav");
 
     audioManager.setReceivingHandler(recorder);
-    audioManager.setSendingHandler(recorder); // Test audio with echo
+    // audioManager.setSendingHandler(recorder); // Test audio with echo
     audioManager.openAudioConnection(authorVoiceChannel);
 
     return true;
