@@ -20,8 +20,9 @@ public class CommandHandler extends ListenerAdapter {
 
     // Register Commands
     createCommand(Info.class);
+    createCommand(Shutdown.class);
 
-    System.out.println("Created Commands: " + commands.keySet().stream().collect(Collectors.joining(",")));
+    System.out.println("Created Commands: " + commands.keySet().stream().map(command -> prefix + command).collect(Collectors.joining(", ")));
   }
 
   private void createCommand(Class<? extends Command> commandClass) {
