@@ -7,3 +7,6 @@ bin
 
 # Ignore Sensitive Files
 token.txt
+
+# Ignore testing Files
+out.wav
