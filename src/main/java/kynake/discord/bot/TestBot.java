@@ -28,8 +28,7 @@ public class TestBot {
 
 
         // Create API Instance
-        GatewayIntent gw = GatewayIntent.GUILD_MESSAGES;
-        jda = JDABuilder.create(token, gw).build();
+        jda = JDABuilder.create(token, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_VOICE_STATES).build();
         try {
             jda.awaitReady();
         } catch(InterruptedException | IllegalStateException e) {
