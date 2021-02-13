@@ -7,8 +7,5 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class TestBotTest {
-    @Test public void testAppHasAGreeting() {
-        TestBot classUnderTest = new TestBot();
-        assertNotNull("app should have a greeting", classUnderTest.getGreeting());
-    }
+
 }

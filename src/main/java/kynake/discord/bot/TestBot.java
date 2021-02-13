@@ -3,35 +3,42 @@
  */
 package kynake.discord.bot;
 
-// import java.nio.file.Files;
-// import java.nio.file.Path;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import javax.security.auth.login.LoginException;
+
 import java.io.IOException;
 
 public class TestBot {
     public static JDA jda;
-
-    public String getGreeting() {
-        return "Hello World!";
-    }
 
     public String getVersion() {
         return System.getProperty("java.version");
     }
 
     public static void main(String[] args) throws IOException, LoginException {
-        TestBot inst = new TestBot();
-        System.out.println(inst.getGreeting());
-        System.out.println("Java version: " + inst.getVersion());
+        System.out.println("Java version: " + new TestBot().getVersion());
 
-        String token = "secret";
+        // Get Token
+        String token = new String(Files.readAllBytes(Paths.get("token.txt")));
 
+
+        // Create API Instance
         GatewayIntent gw = GatewayIntent.GUILD_MESSAGES;
-
         jda = JDABuilder.create(token, gw).build();
+        try {
+            jda.awaitReady();
+        } catch(InterruptedException | IllegalStateException e) {
+            System.err.println("Connection to Discord via JDA failed");
+            e.printStackTrace();
+        }
+
+        // Register API Event Handlers
+        jda.addEventListener(new CommandHandler());
+
     }
 }
