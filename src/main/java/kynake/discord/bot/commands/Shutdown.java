@@ -28,8 +28,9 @@ public class Shutdown implements Command {
     System.out.println(Arrays.toString(args));
 
     AudioReceiveHandler recorder = event.getGuild().getAudioManager().getReceivingHandler();
+    event.getGuild().getAudioManager().setReceivingHandler(null);
     if(recorder instanceof AudioRecorder) {
-      ((AudioRecorder) recorder).writeWAVFile();
+      ((AudioRecorder) recorder).shutdown();
     }
 
     event.getJDA().shutdownNow();

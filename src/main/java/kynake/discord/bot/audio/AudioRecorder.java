@@ -1,6 +1,7 @@
 package kynake.discord.bot.audio;
 
 // JDA
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.audio.AudioReceiveHandler;
 import net.dv8tion.jda.api.audio.UserAudio;
 import net.dv8tion.jda.api.entities.User;
@@ -10,20 +11,22 @@ import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AudioRecorder implements AudioReceiveHandler {
-  private Queue<byte[]> buffer = new ConcurrentLinkedQueue<>(); // buffer of byte chunks of 20ms of user Audio
-  private long requesterID;
-  private File outputFile;
+  private Map<Long, FileOutputStream> userRawPCMData;
+  private JDA jda;
 
-  public AudioRecorder(User requester, String outputFileName) {
-    requesterID = requester.getIdLong();
-    outputFile = new File(outputFileName);
+  public AudioRecorder(JDA jda) {
+    this.userRawPCMData = new HashMap<>();
+    this.jda = jda;
   }
 
   // Receiving
@@ -34,36 +37,76 @@ public class AudioRecorder implements AudioReceiveHandler {
 
   @Override
   public void handleUserAudio(UserAudio userAudio) {
-    if(userAudio.getUser().getIdLong() != requesterID) {
-      return;
-    }
-
-    byte[] data = userAudio.getAudioData(1.0f);
-    buffer.add(data);
-  }
-
-  public void writeWAVFile() {
-    if(buffer.peek() == null) {
-      System.out.println("No Audio was recorded");
-      return;
-    }
-
-    byte[] combinedbuffer = new byte[buffer.peek().length * buffer.size()];
-    int i = 0;
-
-    for (byte[] bytes : buffer) {
-      for (byte b : bytes) {
-        combinedbuffer[i++] = b;
-      }
-    }
-
-    ByteArrayInputStream byteStream = new ByteArrayInputStream(combinedbuffer);
-    AudioInputStream audioStream = new AudioInputStream(byteStream, AudioReceiveHandler.OUTPUT_FORMAT, combinedbuffer.length);
+    User user = userAudio.getUser();
+    Long userID = user.getIdLong();
+    byte[] pcmData = userAudio.getAudioData(1.0f);
 
     try {
-      AudioSystem.write(audioStream, AudioFileFormat.Type.WAVE, outputFile);
+      FileOutputStream fileHandler = userRawPCMData.get(userID);
+      if(fileHandler == null) {
+        fileHandler = OpenUserPCMFile(user);
+        userRawPCMData.put(userID, fileHandler);
+      }
+
+      fileHandler.write(pcmData);
+
     } catch(IOException e) {
+      System.err.println("Error writing PCM to file");
       e.printStackTrace();
     }
+  }
+
+  private FileOutputStream OpenUserPCMFile(User user) throws IOException {
+    String filename = userPCMFilename(user);
+
+    try {
+      return new FileOutputStream(filename);
+    } catch(FileNotFoundException e) {
+      System.err.println("Could not create PCM file");
+      e.printStackTrace();
+      throw new IOException("Could not create PCM file");
+    }
+  }
+
+  private String userPCMFilename(User user) {
+    return user.getName() + ".pcm";
+  }
+
+  private String userWAVFilename(User user) {
+    return user.getName() + ".wav";
+  }
+
+  private void writePCMtoWAV() {
+    for (Map.Entry<Long, FileOutputStream> fileEntry : userRawPCMData.entrySet()) {
+      try {
+        // Close PCM Writing stream
+        fileEntry.getValue().close();
+
+        // Open PCM for Reading and WAV for Writing
+        User user = jda.getUserById(fileEntry.getKey());
+
+        String pcmFilename = userPCMFilename(user);
+        String wavFilename = userWAVFilename(user);
+
+        FileInputStream pcmFile = new FileInputStream(pcmFilename);
+        FileOutputStream wavFile = new FileOutputStream(wavFilename);
+
+        AudioInputStream audioStream = new AudioInputStream(pcmFile, AudioReceiveHandler.OUTPUT_FORMAT, pcmFile.available());
+        AudioSystem.write(audioStream, AudioFileFormat.Type.WAVE, wavFile);
+
+        // Close streams
+        pcmFile.close();
+        wavFile.close();
+      } catch(IOException e) {
+        e.printStackTrace();
+      } finally {
+
+      }
+
+    }
+  }
+
+  public void shutdown() {
+    writePCMtoWAV();
   }
 }
