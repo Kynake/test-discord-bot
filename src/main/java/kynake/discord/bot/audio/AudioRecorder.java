@@ -3,6 +3,7 @@ package kynake.discord.bot.audio;
 // JDA
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.audio.AudioReceiveHandler;
+import net.dv8tion.jda.api.audio.CombinedAudio;
 import net.dv8tion.jda.api.audio.UserAudio;
 import net.dv8tion.jda.api.entities.User;
 
@@ -36,6 +37,11 @@ public class AudioRecorder implements AudioReceiveHandler {
   }
 
   @Override
+  public boolean canReceiveCombined() {
+    return true;
+  }
+
+  @Override
   public void handleUserAudio(UserAudio userAudio) {
     User user = userAudio.getUser();
     Long userID = user.getIdLong();
@@ -53,6 +59,21 @@ public class AudioRecorder implements AudioReceiveHandler {
     } catch(IOException e) {
       System.err.println("Error writing PCM to file");
       e.printStackTrace();
+    }
+  }
+
+  @Override
+  public void handleCombinedAudio(CombinedAudio combinedAudio) {
+    for (Map.Entry<Long, FileOutputStream> userFileEntry : userRawPCMData.entrySet()) {
+      // User was not speaking during this period of time
+      if(!combinedAudio.getUsers().stream().anyMatch(user -> user.getIdLong() == userFileEntry.getKey())) {
+        try {
+          userFileEntry.getValue().write(combinedAudio.getAudioData(1.0f));
+        } catch (Exception e) {
+          System.err.println("Could not record silence for user " + userFileEntry.getKey());
+          e.printStackTrace();
+        }
+      }
     }
   }
 
