@@ -4,6 +4,7 @@ package kynake.discord.bot.audio;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.audio.AudioReceiveHandler;
 import net.dv8tion.jda.api.audio.CombinedAudio;
+import net.dv8tion.jda.api.audio.OpusPacket;
 import net.dv8tion.jda.api.audio.UserAudio;
 import net.dv8tion.jda.api.entities.User;
 
@@ -33,11 +34,16 @@ public class AudioRecorder implements AudioReceiveHandler {
   // Receiving
   @Override
   public boolean canReceiveUser() {
-    return true;
+    return false;
   }
 
   @Override
   public boolean canReceiveCombined() {
+    return false;
+  }
+
+  @Override
+  public boolean canReceiveEncoded() {
     return true;
   }
 
@@ -74,6 +80,33 @@ public class AudioRecorder implements AudioReceiveHandler {
           e.printStackTrace();
         }
       }
+    }
+  }
+
+  @Override
+  public void handleEncodedAudio(OpusPacket packet) {
+    Long userID = packet.getUserId();
+    byte[] pcmData = null;
+    try {
+      pcmData = packet.getAudioData(1.0f);
+    } catch(IllegalStateException e) {
+      // Sometimes the encoded packets are received out-of-order, due to the fact that audio is sent over UDP
+      // In those cases, we simply ignore the audio handling, and wait for the JDA audio handler to sort itself out,
+      // The audio we want will be available later
+      return;
+    }
+
+    try {
+      FileOutputStream fileHandler = userRawPCMData.get(userID);
+      if(fileHandler == null) {
+        fileHandler = OpenUserPCMFile(jda.getUserById(userID));
+        userRawPCMData.put(userID, fileHandler);
+      }
+
+      fileHandler.write(pcmData);
+    } catch(IOException e) {
+      System.err.println("Error writing PCM to file");
+      e.printStackTrace();
     }
   }
 
