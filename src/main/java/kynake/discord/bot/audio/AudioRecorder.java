@@ -44,7 +44,7 @@ public class AudioRecorder implements AudioReceiveHandler {
 
   @Override
   public boolean canReceiveEncoded() {
-    return true;
+    return false;
   }
 
   @Override
